@@ -189,24 +189,29 @@
 (function(){
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const ASPECT = W / H;
+  const wrap = document.getElementById('wrap');
 
-  function fitCanvas(){
-    const wrap = document.getElementById('wrap');
-    const availW = wrap.clientWidth;
-    const availH = wrap.clientHeight;
-    let cw = availW, ch = availW / ASPECT;
-    if(ch > availH){
-      ch = availH;
-      cw = availH * ASPECT;
-    }
-    canvas.style.width = Math.floor(cw) + 'px';
-    canvas.style.height = Math.floor(ch) + 'px';
+  // W/H are the logical (CSS-pixel) play-field dimensions; they change to
+  // exactly match the viewport so the arena always fills the screen edge to
+  // edge, no letterboxing, in either orientation.
+  let W = wrap.clientWidth || window.innerWidth;
+  let H = wrap.clientHeight || window.innerHeight;
+
+  function resizeCanvas(){
+    const cssW = wrap.clientWidth;
+    const cssH = wrap.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = cssW;
+    H = cssH;
   }
-  window.addEventListener('resize', fitCanvas);
-  window.addEventListener('orientationchange', () => setTimeout(fitCanvas, 50));
-  fitCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 50));
+  resizeCanvas();
 
   const overlay = document.getElementById('overlay');
   const overlayTitle = document.getElementById('overlay-title');
