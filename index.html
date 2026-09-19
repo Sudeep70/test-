@@ -29,6 +29,7 @@
   #wrap{
     position: relative;
     width: 100vw; height: 100vh;
+    height: 100dvh;
     display: flex; align-items: center; justify-content: center;
   }
   canvas{
@@ -36,8 +37,6 @@
     background: var(--floor);
     cursor: crosshair;
     box-shadow: 0 0 0 1px #202027, 0 40px 100px -20px rgba(0,0,0,0.8);
-    max-width: 100vw;
-    max-height: 100vh;
     touch-action: none;
   }
   #hud{
@@ -191,6 +190,23 @@
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
+  const ASPECT = W / H;
+
+  function fitCanvas(){
+    const wrap = document.getElementById('wrap');
+    const availW = wrap.clientWidth;
+    const availH = wrap.clientHeight;
+    let cw = availW, ch = availW / ASPECT;
+    if(ch > availH){
+      ch = availH;
+      cw = availH * ASPECT;
+    }
+    canvas.style.width = Math.floor(cw) + 'px';
+    canvas.style.height = Math.floor(ch) + 'px';
+  }
+  window.addEventListener('resize', fitCanvas);
+  window.addEventListener('orientationchange', () => setTimeout(fitCanvas, 50));
+  fitCanvas();
 
   const overlay = document.getElementById('overlay');
   const overlayTitle = document.getElementById('overlay-title');
